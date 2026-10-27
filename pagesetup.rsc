@@ -45,7 +45,7 @@
 /queue type set default kind=sfq
 /queue type set default-small kind=sfq
 
-/queue simple add name="Speed" target=0.0.0.0/0 max-limit=0/0 place-before=0
+/queue simple add name="Speed" target=0.0.0.0/0 max-limit=0/0
 
 # ==============================================================================
 # 5. توجيه صفحة الهوتسبوت وإعدادات Login By والبروفايلات
