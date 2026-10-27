@@ -7,13 +7,29 @@
 }
 
 # ==============================================================================
-# 1. إنشاء النسخة الاحتياطية لضمان الاسترجاع الكامل
+# 1. إنشاء النسخة الاحتياطية بترقيم تصاعدي ذكي (دون استبدال القديم)
 # ==============================================================================
-:local bkpName "Backup_Before_Khubraa_Page"
+:local baseName "Backup_Before_Khubraa_Page"
+:local bkpName $baseName
 
-:log info "Creating backup snapshot..."
+:if ([:len [/file find where name=($baseName . ".backup") || name=($baseName . ".rsc")]] > 0) do={
+    :local idx 1
+    :local stop 0
+    :while ($stop = 0) do={
+        :local candidate ($baseName . "_" . [:tostr $idx])
+        :if ([:len [/file find where name=($candidate . ".backup") || name=($candidate . ".rsc")]] = 0) do={
+            :set bkpName $candidate
+            :set stop 1
+        } else={
+            :set idx ($idx + 1)
+        }
+    }
+}
+
+:log info ("Creating backup snapshot: " . $bkpName)
 /system backup save name=$bkpName
 /export file=$bkpName
+
 :do {
     /tool user-manager database save name=$bkpName
 } on-error={
@@ -46,6 +62,7 @@
 /ip hotspot user profile set [find] insert-queue-before="Speed"
 /ip hotspot user profile set [find] keepalive-timeout=00:02:00
 /ip hotspot user profile set [find] idle-timeout=none
+/ip hotspot user profile set [find] rate-limit=""
 /ip hotspot user profile set [find] shared-users=5
 
 /ip hotspot user profile set [find] on-login=":delay 2000ms; :local a \$\"address\"; :local u \$\"user\"; /ip hotspot active remove [find user=\$u && address!=\$a]; {/import Kh/Updateoff;};"
@@ -104,18 +121,23 @@
 :do { /queue simple move [find name="0_DNS"] [:pick [find] 0] } on-error={}
 
 # ==============================================================================
-# 7. استيراد قائمة التحديثات (معزول ومحمي)
+# 7. استيراد قائمة التحديثات والتنظيف الجذري للملف المؤقت
 # ==============================================================================
+:local tmpFile "tmp_list_update.rsc"
+
 :do {
-    /tool fetch check-certificate=no url="https://raw.githubusercontent.com/ka543/mikrotik-scripts/refs/heads/main/List_update.rsc" dst-path=tmp_list_update.rsc;
+    /tool fetch check-certificate=no url="https://raw.githubusercontent.com/ka543/mikrotik-scripts/refs/heads/main/List_update.rsc" dst-path=$tmpFile;
     :delay 2s;
     :do {
-        /import tmp_list_update.rsc;
+        /import $tmpFile;
     } on-error={};
-    /file remove [find name="tmp_list_update.rsc"];
-} on-error={
-    /file remove [find name="tmp_list_update.rsc"];
-};
+} on-error={};
+
+# تنظيف حتمي وحذف أي أثر للملف المؤقت
+:delay 1s;
+:do {
+    /file remove [find where name=$tmpFile || name=($tmpFile . ".txt")];
+} on-error={};
 
 # ==============================================================================
 # 8. التأكيد على تفعيل الهوتسبوت
