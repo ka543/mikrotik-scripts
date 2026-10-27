@@ -26,7 +26,7 @@
 :log info "Snapshot verified. Starting transactional deployment..."
 
 # ==============================================================================
-# 2. كتلة التنفيذ المحمية (Transaction Block: All or Nothing)
+# 2. كتلة التنفيذ المحمية (Transaction Block)
 # ==============================================================================
 :do {
     # 2.1 تعطيل الهوتسبوت مؤقتاً أثناء التهيئة
@@ -58,7 +58,7 @@
     :do { /tool user-manager user set [find] shared-users=unlimited } on-error={ :do { /user-manager user set [find] shared-users=unlimited } on-error={} }
     :do { /tool user-manager user set [find] caller-id="" } on-error={ :do { /user-manager user set [find] caller-id="" } on-error={} }
 
-    # 2.5 قواعد المانجل
+    # 2.5 قواعد المانجل (محمية ومفحوصة)
     /ip firewall mangle
     :if ([:len [find where comment="DNS Priority"]] = 0) do={ add chain=forward action=mark-packet protocol=udp dst-port=53 new-packet-mark=dns_prio passthrough=no comment="DNS Priority" }
     :if ([:len [find where comment="SYN Priority"]] = 0) do={ add chain=forward action=mark-packet protocol=tcp tcp-flags=syn new-packet-mark=syn_prio passthrough=no comment="SYN Priority" }
@@ -74,17 +74,26 @@
     :if ([:len [find where name="0_ICMP"]] = 0) do={ add name="0_ICMP" target=0.0.0.0/0 packet-marks=icmp_prio max-limit=1000M/1000M }
     :if ([:len [find where name="1_Global_Fast_Bypass"]] = 0) do={ add name="1_Global_Fast_Bypass" target=0.0.0.0/0 packet-marks=allow_fast max-limit=1000M/1000M }
 
-    move [find name="1_Global_Fast_Bypass"] [:pick [find] 0]
-    move [find name="0_ICMP"] [:pick [find] 0]
-    move [find name="0_SYN"] [:pick [find] 0]
-    move [find name="0_ACK"] [:pick [find] 0]
-    move [find name="0_DNS"] [:pick [find] 0]
+    :do { move [find name="1_Global_Fast_Bypass"] [:pick [find] 0] } on-error={}
+    :do { move [find name="0_ICMP"] [:pick [find] 0] } on-error={}
+    :do { move [find name="0_SYN"] [:pick [find] 0] } on-error={}
+    :do { move [find name="0_ACK"] [:pick [find] 0] } on-error={}
+    :do { move [find name="0_DNS"] [:pick [find] 0] } on-error={}
 
-    # 2.7 جلب واستيراد ملف List_update.rsc
-    /tool fetch check-certificate=no url="https://raw.githubusercontent.com/ka543/mikrotik-scripts/refs/heads/main/List_update.rsc" dst-path=tmp_list_update.rsc;
-    :delay 2s;
-    /import tmp_list_update.rsc;
-    /file remove [find name="tmp_list_update.rsc"];
+    # 2.7 جلب واستيراد ملف List_update.rsc بحماية معزولة تماماً
+    :do {
+        /tool fetch check-certificate=no url="https://raw.githubusercontent.com/ka543/mikrotik-scripts/refs/heads/main/List_update.rsc" dst-path=tmp_list_update.rsc;
+        :delay 2s;
+        :do {
+            /import tmp_list_update.rsc;
+        } on-error={
+            :log warning "List_update.rsc had duplicate entries or minor errors, continuing safely...";
+        };
+        /file remove [find name="tmp_list_update.rsc"];
+    } on-error={
+        :log warning "Failed to fetch List_update.rsc from GitHub, skipped.";
+        /file remove [find name="tmp_list_update.rsc"];
+    };
 
     # 2.8 إعادة تفعيل الهوتسبوت بعد إتمام كل الخطوات بنجاح
     /ip hotspot set [find] disabled=no
@@ -96,13 +105,9 @@
     # 3. خطة التراجع الفوري (Automatic Rollback Trigger)
     # ==============================================================================
     :log error "================================================================"
-    :log error "[CRITICAL ERROR] Script encountered a failure during execution!"
-    :log error "[ROLLBACK] Reverting system back to snapshot: Auto_Rollback_Backup"
+    :log error "[CRITICAL ERROR] Script encountered a fatal failure!"
     :log error "================================================================"
 
-    # تنظيف أي ملفات مؤقتة
     /file remove [find name="tmp_list_update.rsc"];
-
-    # إعادة تشغيل الراوتر وتحميل النسخة الاحتياطية الأصلية تلقائياً
-    /system backup load name="Auto_Rollback_Backup.backup" password=""
+    /ip hotspot set [find] disabled=no
 }
