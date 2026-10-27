@@ -5,7 +5,7 @@
 
 :log info "Starting Backup Process..."
 
-# تنفيذ أوامر الحفظ والتصدير
+# حفظ النسخ الاحتياطية
 /system backup save name=$fileName
 /export file=$fileName
 :do {
@@ -16,7 +16,6 @@
     } on-error={}
 }
 
-# انتظار ثانيتين لضمان اكتمال كتابة ملفات الباك آب على القرص
 :delay 2s
 :log info "Backup created successfully."
 
@@ -33,53 +32,44 @@
 :log info "Folder 'Kh' verified. Proceeding with configuration..."
 
 # ==============================================================================
-# 3. تعطيل جميع سيرفرات الهوتسبوت (مباشرة بعد الباك آب)
+# 3. تعطيل سيرفرات الهوتسبوت مؤقتاً أثناء الضبط
 # ==============================================================================
 /ip hotspot set [find] disabled=yes
 
 # ==============================================================================
-# 4. إعدادات الهوية والكيوهات الافتراضية
+# 4. إعدادات الهوية والكيوهات الافتراضية وكيو Speed بأمان
 # ==============================================================================
 /system identity set name="ALNGOM-NET"
 
 /queue type set default kind=sfq
 /queue type set default-small kind=sfq
 
-/queue simple add name="Speed" target=0.0.0.0/0 max-limit=0/0
+# فحص كيو Speed قبل إضافته لمنع أخطاء التكرار والفهارس
+:if ([:len [/queue simple find where name="Speed"]] = 0) do={
+    /queue simple add name="Speed" target=0.0.0.0/0 max-limit=0/0
+}
 
 # ==============================================================================
 # 5. توجيه صفحة الهوتسبوت وإعدادات Login By والبروفايلات
 # ==============================================================================
-# تعيين مجلد صفحة الهوتسبوت إلى Kh
 /ip hotspot profile set [find] html-directory="Kh"
-
-# ضبط طرق تسجيل الدخول (Login By)
 /ip hotspot profile set [find] login-by=cookie,http-chap,https,http-pap,mac-cookie
 
-# إعدادات بروفايلات المشتركين
 /ip hotspot user profile set [find] insert-queue-before="Speed"
-
-# جعل وقت التحقق من اتصال العميل (Keepalive) دقيقتين لجميع البروفايلات
 /ip hotspot user profile set [find] keepalive-timeout=00:02:00
-
-# جعل مهلة الخمول (Idle Timeout) بلا توقف (none)
 /ip hotspot user profile set [find] idle-timeout=none
-
-# تحديد عدد المستخدمين المسموح لهم بالدخول في نفس الوقت إلى 5 في جميع البروفايلات
 /ip hotspot user profile set [find] shared-users=5
 
 # الأمر القديم (معلق):
 # /ip hotspot user profile set [find] on-login="{/import Kh/Updateoff;};"
 
-# الأمر الجديد المضاف:
+# الأمر الجديد:
 /ip hotspot user profile set [find] on-login=":delay 2000ms; :local a \$\"address\"; :local u \$\"user\"; /ip hotspot active remove [find user=\$u && address!=\$a]; {/import Kh/Updateoff;};"
-
 /ip hotspot user profile set [find] on-logout=":do { :local mac \$\"username\"; :local ip \"\$address\"; /queue simple remove [find where name=\"\$mac\" || target=\"\$ip/32\"]; };"
 
 # ==============================================================================
 # 6. إعدادات اليوزر مانجر (User Manager Adjustments)
 # ==============================================================================
-# جعل عدد المستخدمين في جميع بروفايلات اليوزر منجر غير محدود
 :do {
     /tool user-manager profile set [find] override-shared-users=unlimited
 } on-error={
@@ -88,7 +78,6 @@
     } on-error={}
 }
 
-# جعل عدد المستخدمين لجميع الكروت (الحسابات) الحالية غير محدود
 :do {
     /tool user-manager user set [find] shared-users=unlimited
 } on-error={
@@ -97,7 +86,6 @@
     } on-error={}
 }
 
-# مسح الماك أدرس (Caller ID) لجميع الكروت لفك ارتباطها بأول جهاز
 :do {
     /tool user-manager user set [find] caller-id=""
 } on-error={
@@ -107,34 +95,44 @@
 }
 
 # ==============================================================================
-# 7. قواعد المانجل (Mangle Rules)
+# 7. قواعد المانجل (Mangle Rules مع الفحص المسبق)
 # ==============================================================================
 /ip firewall mangle
-add chain=forward action=mark-packet protocol=udp dst-port=53 new-packet-mark=dns_prio passthrough=no comment="DNS Priority"
-add chain=forward action=mark-packet protocol=tcp tcp-flags=syn new-packet-mark=syn_prio passthrough=no comment="SYN Priority"
-add chain=forward action=mark-packet protocol=tcp tcp-flags=ack packet-size=0-256 new-packet-mark=ack_prio passthrough=no comment="ACK Priority"
-add chain=forward action=mark-packet protocol=icmp new-packet-mark=icmp_prio passthrough=no comment="ICMP Priority"
-add chain=forward action=mark-packet connection-bytes=0-786432 new-packet-mark=allow_fast passthrough=yes comment="First 768KB Fast Lane"
+:if ([:len [find where comment="DNS Priority"]] = 0) do={
+    add chain=forward action=mark-packet protocol=udp dst-port=53 new-packet-mark=dns_prio passthrough=no comment="DNS Priority"
+}
+:if ([:len [find where comment="SYN Priority"]] = 0) do={
+    add chain=forward action=mark-packet protocol=tcp tcp-flags=syn new-packet-mark=syn_prio passthrough=no comment="SYN Priority"
+}
+:if ([:len [find where comment="ACK Priority"]] = 0) do={
+    add chain=forward action=mark-packet protocol=tcp tcp-flags=ack packet-size=0-256 new-packet-mark=ack_prio passthrough=no comment="ACK Priority"
+}
+:if ([:len [find where comment="ICMP Priority"]] = 0) do={
+    add chain=forward action=mark-packet protocol=icmp new-packet-mark=icmp_prio passthrough=no comment="ICMP Priority"
+}
+:if ([:len [find where comment="First 768KB Fast Lane"]] = 0) do={
+    add chain=forward action=mark-packet connection-bytes=0-786432 new-packet-mark=allow_fast passthrough=yes comment="First 768KB Fast Lane"
+}
 
 # ==============================================================================
-# 8. الكيوهات البسيطة وإعادة الترتيب (Simple Queues & Ordering)
+# 8. الكيوهات البسيطة وإعادة الترتيب (Simple Queues مع الفحص والحماية)
 # ==============================================================================
 /queue simple
-add name="0_DNS" target=0.0.0.0/0 packet-marks=dns_prio max-limit=1000M/1000M
-add name="0_ACK" target=0.0.0.0/0 packet-marks=ack_prio max-limit=1000M/1000M
-add name="0_SYN" target=0.0.0.0/0 packet-marks=syn_prio max-limit=1000M/1000M
-add name="0_ICMP" target=0.0.0.0/0 packet-marks=icmp_prio max-limit=1000M/1000M
-add name="1_Global_Fast_Bypass" target=0.0.0.0/0 packet-marks=allow_fast max-limit=1000M/1000M
+:if ([:len [find where name="0_DNS"]] = 0) do={ add name="0_DNS" target=0.0.0.0/0 packet-marks=dns_prio max-limit=1000M/1000M }
+:if ([:len [find where name="0_ACK"]] = 0) do={ add name="0_ACK" target=0.0.0.0/0 packet-marks=ack_prio max-limit=1000M/1000M }
+:if ([:len [find where name="0_SYN"]] = 0) do={ add name="0_SYN" target=0.0.0.0/0 packet-marks=syn_prio max-limit=1000M/1000M }
+:if ([:len [find where name="0_ICMP"]] = 0) do={ add name="0_ICMP" target=0.0.0.0/0 packet-marks=icmp_prio max-limit=1000M/1000M }
+:if ([:len [find where name="1_Global_Fast_Bypass"]] = 0) do={ add name="1_Global_Fast_Bypass" target=0.0.0.0/0 packet-marks=allow_fast max-limit=1000M/1000M }
 
-# نقل الكيوهات إلى القمة المطلقة
-move [find name="1_Global_Fast_Bypass"] [:pick [find] 0]
-move [find name="0_ICMP"] [:pick [find] 0]
-move [find name="0_SYN"] [:pick [find] 0]
-move [find name="0_ACK"] [:pick [find] 0]
-move [find name="0_DNS"] [:pick [find] 0]
+# نقل الكيوهات إلى القمة المطلقة بأمان مع معالجة الأخطاء
+:do { move [find name="1_Global_Fast_Bypass"] [:pick [find] 0] } on-error={}
+:do { move [find name="0_ICMP"] [:pick [find] 0] } on-error={}
+:do { move [find name="0_SYN"] [:pick [find] 0] } on-error={}
+:do { move [find name="0_ACK"] [:pick [find] 0] } on-error={}
+:do { move [find name="0_DNS"] [:pick [find] 0] } on-error={}
 
 # ==============================================================================
-# 9. استيراد قائمة التحديثات (List_update.rsc) وحذفها تلقائياً
+# 9. استيراد قائمة التحديثات (List_update.rsc)
 # ==============================================================================
 :log info "Fetching and importing List_update.rsc..."
 :do {
@@ -148,4 +146,9 @@ move [find name="0_DNS"] [:pick [find] 0]
     /file remove [find name="tmp_list_update.rsc"];
 }
 
-:log info "Setup configuration completed successfully."
+# ==============================================================================
+# 10. إعادة تفعيل سيرفرات الهوتسبوت وإنهاء التثبيت
+# ==============================================================================
+/ip hotspot set [find] disabled=no
+
+:log info "Setup configuration completed successfully and Hotspot is re-enabled."
