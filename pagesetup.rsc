@@ -40,7 +40,7 @@
 # ==============================================================================
 # 4. إعدادات الهوية والكيوهات الافتراضية
 # ==============================================================================
-/system identity set name="MyRouter"
+/system identity set name="ALNGOM-NET"
 
 /queue type set default kind=sfq
 /queue type set default-small kind=sfq
