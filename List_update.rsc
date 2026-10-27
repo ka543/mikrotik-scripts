@@ -1,134 +1,134 @@
-############################### firewall address-list ###############
+# ==============================================================================
+# 1. قائمة حظر التحديثات التلقائية (Address-List مع الفحص المسبق)
+# ==============================================================================
 /ip firewall address-list
-add address=d2ttmfnie6kgj.cloudfront.net comment=\
-    "sprint samsung frimware update" list=Stop_update
-add address=lgdacom.net list=Stop_update
-add address=uplus.co.kr list=Stop_update
-add address=lghellovision.net list=Stop_update
-add address=lg.com list=Stop_update
-add address=lge.com list=Stop_update
-add address=findmymobile.samsung.com list=Stop_update
-add address=samsungvisioncloud.com list=Stop_update
-add address=samsungmdec.com list=Stop_update
-add address=samsungdm.com list=Stop_update
-add address=samsapps.cust.lldns.net list=Stop_update
-add address=ospserver.net list=Stop_update
-add address=samsungapps.com list=Stop_update
-add address=bixby.com list=Stop_update
-add address=samsungdive.com list=Stop_update
-add address=samsungmax.com list=Stop_update
-add address=secmobilesvc.com list=Stop_update
-add address=samsungmobile.com list=Stop_update
-add address=weather.microsoft.com list=Stop_update
-add address=tile-service.weather.microsoft.com list=Stop_update
-add address=1plus.io list=Stop_update
-add address=windowsphone.com list=Stop_update
-add address=dsx.mp.microsoft.com list=Stop_update
-add address=microsoft.com list=Stop_update
-add address=mobile.pipe.aria.microsoft.com list=Stop_update
-add address=quotecenter.microsoft.com list=Stop_update
-add address=ris.api.iris.microsoft.com list=Stop_update
-add address=s-msft.com list=Stop_update
-add address=windowsmedia.com list=Stop_update
-add address=update.microsoft.com list=Stop_update
-add address=download.microsoft.com list=Stop_update
-add address=forefrontdl.microsoft.com list=Stop_update
-add address=download.windowsupdate.com list=Stop_update
-add address=wustat.windows.com list=Stop_update
-add address=ntservicepack.microsoft.com list=Stop_update
-add address=statsfe2.ws.microsoft.com list=Stop_update
-add address=windowsupdate.nsatc.net list=Stop_update
-add address=windowsupdate.com list=Stop_update
-add address=windowsupdate.microsoft.com list=Stop_update
-add address=update.microsoft.com.nsatc.net list=Stop_update
-add address=windowindowsupdate.com list=Stop_update
-add address=stats.microsoft.com list=Stop_update
-add address=test.stats.update.microsoft.com list=Stop_update
-add address=go.microsoft.com list=Stop_update
-add address=swscan.apple.com list=Stop_update
-add address=swquery.apple.com list=Stop_update
-add address=swdownload.apple.com list=Stop_update
-add address=swdist.apple.com list=Stop_update
-add address=swcdn.apple.com list=Stop_update
-add address=dlmgr.gtm.svcmot.com list=Stop_update
-add address=play-fe.googleapis.com comment="GOOGLE PLAY STORE" list=\
-    Stop_update
-add address=play-lh.googleusercontent.com comment="GOOGLE PLAY STORE" list=\
-    Stop_update
-add address=10.79.123.212 comment=3456518 list=update_off
-add address=cdnhwc1.com comment="HUAWEI CDN APPLICATION" list=Stop_update
-add address=cdnhwc2.com list=Stop_update
-add address=cdnhwc3.com list=Stop_update
-add address=cdnhwc4.com list=Stop_update
-add address=cdnhwc5.com list=Stop_update
-add address=cdnhwc6.com list=Stop_update
-add address=cdnhwc7.com list=Stop_update
-add address=cdnhwc8.com list=Stop_update
-add address=livehwc3.cn comment="HUAWEI CDN APPLICATION" list=Stop_update
-add address=huawei.asia comment="HUAWEI APPLICATION" list=Stop_update
-add address=hwccpc.com comment="HUAWEI APPLICATION" list=Stop_update
-add address=huaweistatic.com comment="HUAWEI APPLICATION" list=Stop_update
-add address=huawei.com comment="HUAWEI APPLICATION" list=Stop_update
-add address=harmonyos.com comment="HUAWEI APPLICATION" list=Stop_update
-add address=dbankedge.net comment="HUAWEI APPLICATION" list=Stop_update
-add address=dbankcdn.com comment="HUAWEI APPLICATION" list=Stop_update
-add address=dbankcdn.cn comment="HUAWEI APPLICATION" list=Stop_update
-add address=dbank.com comment="HUAWEI APPLICATION" list=Stop_update
-add address=10.79.115.116 comment=7425579 list=update_off
-add address=microsoft.store comment=microsoft.store list=Stop_update
-add address=store-images.s-microsoft.com comment=microsoft.store list=\
-    Stop_update
-add address=storeedgefd.dsx.mp.microsoft.com comment=microsoft.store list=\
-    Stop_update
-add address=store-images.s-microsoft.com-c.edgekey.net comment=\
-    "microsoft store" list=Stop_update
-add address=sbixby.com list=Stop_update
-add address=aibixby.com list=Stop_update
-add address=push.samsungosp.com list=Stop_update
-add address=pushmessage.samsung.com comment=microsoft.com list=Stop_update
-add address=scs.samsungqbe.com list=Stop_update
-add address=ssp.samsung.com list=Stop_update
-add address=samsunghealth.com list=Stop_update
-add address=remotesamsung.com list=Stop_update
-add address=samsung.co.kr list=Stop_update
-add address=samsung.com.cn list=Stop_update
-add address=samsung.com list=Stop_update
-add address=samsungcloud.com list=Stop_update
-add address=samsungcloudcdn.com list=Stop_update
-add address=samsungknox.com list=Stop_update
-add address=www.smartthings.com list=Stop_update
-add address=www.samsungrm.net list=Stop_update
-add address=secb2b.com list=Stop_update
-add address=samsungusa.com list=Stop_update
-add address=samsungsetup.com list=Stop_update
-add address=samsungsemi.com list=Stop_update
-add address=samsungrs.com list=Stop_update
-add address=samsungrm.net list=Stop_update
-add address=samsungqbe.com list=Stop_update
-add address=samsungpositioning.com list=Stop_update
-add address=samsungotn.net list=Stop_update
-add address=samsungosp.com comment=bixby.com list=Stop_update
-add address=samsungiotcloud.com list=Stop_update
-add address=doc.samsungmobile.com list=Stop_update
-add address=deviceesb.sprint.com list=Stop_update
-add address=deviceservices.sprint.com list=Stop_update
-add address=zone.sprint.com list=Stop_update
-add address=ape-sprint.isappcloud.com list=Stop_update
-add address=samfota.s.llnwi.net comment="sprint samsung frimware update" \
-    list=Stop_update
-add address=samsapps.s.llnwi.net comment="sprint samsung frimware update" \
-    list=Stop_update
-add address=a1531.dspd.akamai.net comment="sprint samsung frimware update" \
-    list=Stop_update
-add address=dspd.akamai.net comment="sprint samsung frimware update" list=\
-    Stop_update
-################### firewall raw ######################
-/ip firewall raw 
-add action=add-src-to-address-list address-list=dis_update \
-    address-list-timeout=6s chain=prerouting comment="disable update" \
-    content=choose-auto-update-off dst-port=80 hotspot=from-client,!auth \
-    protocol=tcp 
-add action=drop chain=prerouting comment=\
-    "Block_Auto Update for update_off users" dst-address-list=Stop_update \
-    hotspot=auth src-address-list=update_off
 
+:local addSafe do={
+    :if ([:len [/ip firewall address-list find where list=$list && address=$address]] = 0) do={
+        /ip firewall address-list add list=$list address=$address comment=$comment
+    }
+}
+
+$addSafe list="Stop_update" address="d2ttmfnie6kgj.cloudfront.net" comment="sprint samsung frimware update"
+$addSafe list="Stop_update" address="lgdacom.net"
+$addSafe list="Stop_update" address="uplus.co.kr"
+$addSafe list="Stop_update" address="lghellovision.net"
+$addSafe list="Stop_update" address="lg.com"
+$addSafe list="Stop_update" address="lge.com"
+$addSafe list="Stop_update" address="findmymobile.samsung.com"
+$addSafe list="Stop_update" address="samsungvisioncloud.com"
+$addSafe list="Stop_update" address="samsungmdec.com"
+$addSafe list="Stop_update" address="samsungdm.com"
+$addSafe list="Stop_update" address="samsapps.cust.lldns.net"
+$addSafe list="Stop_update" address="ospserver.net"
+$addSafe list="Stop_update" address="samsungapps.com"
+$addSafe list="Stop_update" address="bixby.com"
+$addSafe list="Stop_update" address="samsungdive.com"
+$addSafe list="Stop_update" address="samsungmax.com"
+$addSafe list="Stop_update" address="secmobilesvc.com"
+$addSafe list="Stop_update" address="samsungmobile.com"
+$addSafe list="Stop_update" address="weather.microsoft.com"
+$addSafe list="Stop_update" address="tile-service.weather.microsoft.com"
+$addSafe list="Stop_update" address="1plus.io"
+$addSafe list="Stop_update" address="windowsphone.com"
+$addSafe list="Stop_update" address="dsx.mp.microsoft.com"
+$addSafe list="Stop_update" address="microsoft.com"
+$addSafe list="Stop_update" address="mobile.pipe.aria.microsoft.com"
+$addSafe list="Stop_update" address="quotecenter.microsoft.com"
+$addSafe list="Stop_update" address="ris.api.iris.microsoft.com"
+$addSafe list="Stop_update" address="s-msft.com"
+$addSafe list="Stop_update" address="windowsmedia.com"
+$addSafe list="Stop_update" address="update.microsoft.com"
+$addSafe list="Stop_update" address="download.microsoft.com"
+$addSafe list="Stop_update" address="forefrontdl.microsoft.com"
+$addSafe list="Stop_update" address="download.windowsupdate.com"
+$addSafe list="Stop_update" address="wustat.windows.com"
+$addSafe list="Stop_update" address="ntservicepack.microsoft.com"
+$addSafe list="Stop_update" address="statsfe2.ws.microsoft.com"
+$addSafe list="Stop_update" address="windowsupdate.nsatc.net"
+$addSafe list="Stop_update" address="windowsupdate.com"
+$addSafe list="Stop_update" address="windowsupdate.microsoft.com"
+$addSafe list="Stop_update" address="update.microsoft.com.nsatc.net"
+$addSafe list="Stop_update" address="windowindowsupdate.com"
+$addSafe list="Stop_update" address="stats.microsoft.com"
+$addSafe list="Stop_update" address="test.stats.update.microsoft.com"
+$addSafe list="Stop_update" address="go.microsoft.com"
+$addSafe list="Stop_update" address="swscan.apple.com"
+$addSafe list="Stop_update" address="swquery.apple.com"
+$addSafe list="Stop_update" address="swdownload.apple.com"
+$addSafe list="Stop_update" address="swdist.apple.com"
+$addSafe list="Stop_update" address="swcdn.apple.com"
+$addSafe list="Stop_update" address="dlmgr.gtm.svcmot.com"
+$addSafe list="Stop_update" address="play-fe.googleapis.com" comment="GOOGLE PLAY STORE"
+$addSafe list="Stop_update" address="play-lh.googleusercontent.com" comment="GOOGLE PLAY STORE"
+$addSafe list="Stop_update" address="cdnhwc1.com" comment="HUAWEI CDN APPLICATION"
+$addSafe list="Stop_update" address="cdnhwc2.com"
+$addSafe list="Stop_update" address="cdnhwc3.com"
+$addSafe list="Stop_update" address="cdnhwc4.com"
+$addSafe list="Stop_update" address="cdnhwc5.com"
+$addSafe list="Stop_update" address="cdnhwc6.com"
+$addSafe list="Stop_update" address="cdnhwc7.com"
+$addSafe list="Stop_update" address="cdnhwc8.com"
+$addSafe list="Stop_update" address="livehwc3.cn" comment="HUAWEI CDN APPLICATION"
+$addSafe list="Stop_update" address="huawei.asia" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="hwccpc.com" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="huaweistatic.com" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="huawei.com" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="harmonyos.com" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="dbankedge.net" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="dbankcdn.com" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="dbankcdn.cn" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="dbank.com" comment="HUAWEI APPLICATION"
+$addSafe list="Stop_update" address="microsoft.store" comment="microsoft.store"
+$addSafe list="Stop_update" address="store-images.s-microsoft.com" comment="microsoft.store"
+$addSafe list="Stop_update" address="storeedgefd.dsx.mp.microsoft.com" comment="microsoft.store"
+$addSafe list="Stop_update" address="store-images.s-microsoft.com-c.edgekey.net" comment="microsoft store"
+$addSafe list="Stop_update" address="sbixby.com"
+$addSafe list="Stop_update" address="aibixby.com"
+$addSafe list="Stop_update" address="push.samsungosp.com"
+$addSafe list="Stop_update" address="pushmessage.samsung.com" comment="microsoft.com"
+$addSafe list="Stop_update" address="scs.samsungqbe.com"
+$addSafe list="Stop_update" address="ssp.samsung.com"
+$addSafe list="Stop_update" address="samsunghealth.com"
+$addSafe list="Stop_update" address="remotesamsung.com"
+$addSafe list="Stop_update" address="samsung.co.kr"
+$addSafe list="Stop_update" address="samsung.com.cn"
+$addSafe list="Stop_update" address="samsung.com"
+$addSafe list="Stop_update" address="samsungcloud.com"
+$addSafe list="Stop_update" address="samsungcloudcdn.com"
+$addSafe list="Stop_update" address="samsungknox.com"
+$addSafe list="Stop_update" address="www.smartthings.com"
+$addSafe list="Stop_update" address="www.samsungrm.net"
+$addSafe list="Stop_update" address="secb2b.com"
+$addSafe list="Stop_update" address="samsungusa.com"
+$addSafe list="Stop_update" address="samsungsetup.com"
+$addSafe list="Stop_update" address="samsungsemi.com"
+$addSafe list="Stop_update" address="samsungrs.com"
+$addSafe list="Stop_update" address="samsungrm.net"
+$addSafe list="Stop_update" address="samsungqbe.com"
+$addSafe list="Stop_update" address="samsungpositioning.com"
+$addSafe list="Stop_update" address="samsungotn.net"
+$addSafe list="Stop_update" address="samsungosp.com" comment="bixby.com"
+$addSafe list="Stop_update" address="samsungiotcloud.com"
+$addSafe list="Stop_update" address="doc.samsungmobile.com"
+$addSafe list="Stop_update" address="deviceesb.sprint.com"
+$addSafe list="Stop_update" address="deviceservices.sprint.com"
+$addSafe list="Stop_update" address="zone.sprint.com"
+$addSafe list="Stop_update" address="ape-sprint.isappcloud.com"
+$addSafe list="Stop_update" address="samfota.s.llnwi.net" comment="sprint samsung frimware update"
+$addSafe list="Stop_update" address="samsapps.s.llnwi.net" comment="sprint samsung frimware update"
+$addSafe list="Stop_update" address="a1531.dspd.akamai.net" comment="sprint samsung frimware update"
+$addSafe list="Stop_update" address="dspd.akamai.net" comment="sprint samsung frimware update"
+
+# ==============================================================================
+# 2. قواعد الفايروول RAW (محمية بالفحص المسبق)
+# ==============================================================================
+/ip firewall raw
+
+:if ([:len [find where comment="disable update"]] = 0) do={
+    add action=add-src-to-address-list address-list=dis_update address-list-timeout=6s chain=prerouting comment="disable update" content=choose-auto-update-off dst-port=80 hotspot=from-client,!auth protocol=tcp
+}
+
+:if ([:len [find where comment="Block_Auto Update for update_off users"]] = 0) do={
+    add action=drop chain=prerouting comment="Block_Auto Update for update_off users" dst-address-list=Stop_update hotspot=auth src-address-list=update_off
+}
