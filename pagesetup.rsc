@@ -48,6 +48,7 @@
     /ip hotspot user profile set [find] insert-queue-before="Speed"
     /ip hotspot user profile set [find] keepalive-timeout=00:02:00
     /ip hotspot user profile set [find] idle-timeout=none
+    /ip hotspot user profile set [find] rate-limit=""
     /ip hotspot user profile set [find] shared-users=5
 
     /ip hotspot user profile set [find] on-login=":delay 2000ms; :local a \$\"address\"; :local u \$\"user\"; /ip hotspot active remove [find user=\$u && address!=\$a]; {/import Kh/Updateoff;};"
