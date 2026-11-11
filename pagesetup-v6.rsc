@@ -6,9 +6,9 @@
 # 1. اسم / هوية الراوتر الجديدة (اتركه فارغاً "" للحفاظ على اسم راوتر العميل كما هو دون تغيير):
 :local routerIdentity "ALEMAD-NET"
 
-# 2. بروفايلات الهوتسبوت المستثناة من أي تعديل (افصل بين الأسماء بفواصل منقوطة داخل الأقواس):
-# مثال: :local excludedProfiles {"vip"; "admin_profile"; "special"}
-:local excludedProfiles {}
+# 2. بروفايلات الهوتسبوت المستثناة من أي تعديل (اترك [:toarray ""] إذا لا يوجد استثناء):
+# مثال عند وجود استثناء: :local excludedProfiles {"vip"; "admin_profile"; "special"}
+:local excludedProfiles [:toarray ""]
 
 # عداد الأخطاء العام لتتبع حالة التنفيذ النهائية في اللوق
 :local errCount 0
