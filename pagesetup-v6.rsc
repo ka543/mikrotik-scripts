@@ -9,6 +9,7 @@
 # 2. بروفايلات الهوتسبوت المستثناة من أي تعديل (اترك [:toarray ""] إذا لا يوجد استثناء):
 # مثال عند وجود استثناء: :local excludedProfiles {"vip"; "admin_profile"; "special"}
 :local excludedProfiles [:toarray ""]
+#:local excludedProfiles [:toarray "vip,admin,2m"]
 
 # عداد الأخطاء العام لتتبع حالة التنفيذ النهائية في اللوق
 :local errCount 0
