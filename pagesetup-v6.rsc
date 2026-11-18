@@ -166,7 +166,7 @@
 
 # ب) تعديل بروفايلات مستخدمي الهوتسبوت غير المستثناة
 :local onLoginCmd ""
-:if ($enableUserManager = true || $enableUserManager = "true") do={
+:if ([:tostr $enableUserManager] = "true") do={
     :set onLoginCmd (":delay 2000ms; :local a \$\"address\"; :local u \$\"user\"; /ip hotspot active remove [find user=\$u && address!=\$a]; {/import " . $htmlDir . "/Updateoff;};")
 } else={
     :set onLoginCmd ("{/import " . $htmlDir . "/Updateoff;};")
@@ -186,7 +186,7 @@
             set $up keepalive-timeout=00:02:00
             set $up idle-timeout=none
             set $up rate-limit=""
-            :if ($enableUserManager = true || $enableUserManager = "true") do={
+            :if ([:tostr $enableUserManager] = "true") do={
                 set $up shared-users=5
             }
             set $up on-login=$onLoginCmd
@@ -231,7 +231,7 @@
 # ==============================================================================
 # 4. إعدادات اليوزر مانجر في الإصدار 6
 # ==============================================================================
-:if ($enableUserManager = true || $enableUserManager = "true") do={
+:if ([:tostr $enableUserManager] = "true") do={
     :log info "[SEC 4] Applying User Manager v6 settings..."
 
     :do {
