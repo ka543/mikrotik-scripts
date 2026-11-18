@@ -11,7 +11,7 @@
 :local excludedProfiles [:toarray ""]
 
 # 3. تفعيل تعديل إعدادات اليوزر مانجر (User Manager) تلقائياً (true للتفعيل أو false للتخطي):
-:local enableUserManager true
+:local enableUserManager false
 
 # عداد الأخطاء العام لتتبع حالة التنفيذ النهائية في اللوق
 :local errCount 0
@@ -235,7 +235,8 @@
     :log info "[SEC 4] Applying User Manager v6 settings..."
 
     :do {
-        [[:parse "/tool user-manager profile set [find] override-shared-users=unlimited; /tool user-manager user set [find] shared-users=unlimited; /tool user-manager user set [find] caller-id=\"\";"]]
+        :local runUm [:parse ":do { /tool user-manager profile set [find] override-shared-users=unlimited } on-error={}; :do { /tool user-manager user set [find] shared-users=unlimited caller-id=\"\" } on-error={};"]
+        $runUm
         :log info "[SEC 4 - OK] User Manager v6 settings applied successfully."
     } on-error={
         :log warning "[SEC 4 - SKIPPED] User Manager v6 not configured (package not installed or inaccessible)."
