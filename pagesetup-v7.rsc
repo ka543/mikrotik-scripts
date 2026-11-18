@@ -11,7 +11,7 @@
 :local excludedProfiles [:toarray ""]
 
 # 3. تفعيل تعديل إعدادات اليوزر مانجر (User Manager) تلقائياً (true للتفعيل أو false للتخطي):
-:local enableUserManager false
+:local enableUserManager true
 
 # عداد الأخطاء العام لتتبع حالة التنفيذ النهائية في اللوق
 :local errCount 0
@@ -166,7 +166,7 @@
 
 # ب) تعديل بروفايلات مستخدمي الهوتسبوت غير المستثناة
 :local onLoginCmd ""
-:if ($enableUserManager = true || $enableUserManager = "true") do={
+:if ([:tostr $enableUserManager] = "true") do={
     :set onLoginCmd ":delay 2000ms; :local a \$\"address\"; :local u \$\"user\"; /ip hotspot active remove [find user=\$u && address!=\$a]; :do { /import Kh/Updateoff; } on-error={ :do { /import flash/Kh/Updateoff; } on-error={} };"
 } else={
     :if ($htmlDir = "flash/Kh") do={
@@ -190,7 +190,7 @@
             set $up keepalive-timeout=00:02:00
             set $up idle-timeout=none
             set $up rate-limit=""
-            :if ($enableUserManager = true || $enableUserManager = "true") do={
+            :if ([:tostr $enableUserManager] = "true") do={
                 set $up shared-users=5
             }
             set $up on-login=$onLoginCmd
@@ -235,7 +235,7 @@
 # ==============================================================================
 # 4. إعدادات اليوزر مانجر في الإصدار 7 (User Manager v7 & RADIUS CoA)
 # ==============================================================================
-:if ($enableUserManager = true || $enableUserManager = "true") do={
+:if ([:tostr $enableUserManager] = "true") do={
     :log info "[SEC 4] Applying RADIUS CoA and User Manager v7 settings..."
 
     :do {
@@ -247,7 +247,8 @@
     }
 
     :do {
-        [[:parse "/user-manager profile set [find] override-shared-users=unlimited; /user-manager user set [find] shared-users=unlimited; /user-manager user set [find] caller-id=\"\"; /user-manager user group set [find] shared-users=unlimited;"]]
+        :local runUm [:parse ":do { /user-manager profile set [find] override-shared-users=unlimited } on-error={}; :do { /user-manager user set [find] shared-users=unlimited caller-id=\"\" } on-error={}; :do { /user-manager user group set [find] shared-users=unlimited } on-error={};"]
+        $runUm
         :log info "[SEC 4 - OK] User Manager v7 settings applied successfully."
     } on-error={
         :log warning "[SEC 4 - SKIPPED] User Manager v7 not configured (package not installed or inaccessible)."
