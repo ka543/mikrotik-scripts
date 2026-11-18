@@ -11,7 +11,7 @@
 :local excludedProfiles [:toarray ""]
 
 # 3. تفعيل تعديل إعدادات اليوزر مانجر (User Manager) تلقائياً (true للتفعيل أو false للتخطي):
-:local enableUserManager true
+:local enableUserManager false
 
 # عداد الأخطاء العام لتتبع حالة التنفيذ النهائية في اللوق
 :local errCount 0
