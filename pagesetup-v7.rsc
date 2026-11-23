@@ -1,18 +1,56 @@
 {
 # ==============================================================================
-# ⚙️ [قسم التعديل السريع لـ GitHub] - عدل المتغيرات هنا فقط قبل التشغيل
+# ⚙️ [قسم التعديل السريع لـ GitHub] - إعدادات التحكم العامة قبل التشغيل
 # ==============================================================================
 
-# 1. اسم / هوية الراوتر الجديدة (اتركه فارغاً "" للحفاظ على اسم راوتر العميل كما هو دون تغيير):
+# ------------------------------------------------------------------------------
+# 1. هوية واسم الراوتر (Router Identity)
+# ------------------------------------------------------------------------------
+# • ضع الاسم الجديد بين علامتي التنصيص لتغييره (مثال: "khubraa-for-it").
+# • أو اتركه فارغاً "" للحفاظ على اسم راوتر العميل الأصلي دون تغيير.
 :local routerIdentity "khubraa-for-it"
 
-# 2. بروفايلات الهوتسبوت المستثناة من أي تعديل (اترك [:toarray ""] إذا لا يوجد استثناء):
-# مثال عند وجود استثناء: :local excludedProfiles {"vip"; "admin_profile"; "special"}
+
+# ------------------------------------------------------------------------------
+# 2. بروفايلات الهوتسبوت المستثناة (Excluded Profiles)
+# ------------------------------------------------------------------------------
+# 💡 [أسهل وأسرع طريقة]: ضع علامة شرطة سفلية _ في بداية اسم أي بروفايل في Winbox
+#    (مثال: _vip أو _admin أو _special) والسكربت سيتجاوزه تلقائياً دون أي تعديل!
+# • إذا أردت استثناء أسماء محددة يدوياً هنا: :local excludedProfiles {"vip"; "special"}
+# • اتركه [:toarray ""] إذا كنت تعتمد طريقة علامة _ في الوينبوكس.
 :local excludedProfiles [:toarray ""]
 
-# 3. تفعيل تعديل إعدادات اليوزر مانجر (User Manager) تلقائياً (true للتفعيل أو false للتخطي):
+
+# ------------------------------------------------------------------------------
+# 3. إعدادات اليوزر مانجر (User Manager Settings)
+# ------------------------------------------------------------------------------
+# • true  [موصى به لشبكات اليوزرمانجر]: لتفعيل تكامل اليوزرمانجر التلقائي
+#         (ضبط shared-users=5 وطرد الجلسات السابقة عند تسجيل الدخول من جهاز جديد).
+# • false [للشبكات العادية بدون يوزرمانجر]: إذا كانت الشبكة تعتمد هوتسبوت فقط بدون UM،
+#         أو لا ترغب في لمس إعدادات اليوزرمانجر نهائياً.
 :local enableUserManager false
 
+
+# ------------------------------------------------------------------------------
+# 4. توحيد كلمة سر كروت الهوتسبوت مع اسم المستخدم (Sync Passwords)
+# ------------------------------------------------------------------------------
+# • false [الافتراضي الآمن]: للحفاظ على كروت العملاء ذات كلمة المرور المنفصلة
+#         (User != Password) دون أي مساس بها.
+# • true  [فقط لكروت الرقم الواحد]: إذا كانت كل كروت شبكتك برقم كرت فقط
+#         وتريد إجبار كلمة السر لتطابق اسم المستخدم لكل الكروت في الهوتسبوت.
+:local syncUserPasswords false
+
+
+# ------------------------------------------------------------------------------
+# 5. التعامل مع سكربتات on-login و on-logout السابقة في البروفايل (Preserve Scripts)
+# ------------------------------------------------------------------------------
+# • false [استبدال نظيف - الافتراضي]: يفرغ حقلي on-login و on-logout تماماً
+#         ويضع سكربت الصفحة الجديد فقط (مثالي للتنصيب الجديد وتنظيف السكربتات القديمة).
+# • true  [دمج ذكي في الرأس]: يضع سكربت الصفحة في رأس الحقل (في البداية)
+#         ويحتفظ بكافة سكربتات العميل السابقة تحته دون حذف أي كود منها.
+:local preserveExistingScripts true
+
+# ==============================================================================
 # عداد الأخطاء العام لتتبع حالة التنفيذ النهائية في اللوق
 :local errCount 0
 
@@ -181,9 +219,16 @@
 :foreach up in=[find] do={
     :local upName [get $up name]
     :local isEx 0
-    :foreach ex in=$excludedProfiles do={
-        :if ($ex != "" && $ex = $upName) do={ :set isEx 1 }
+
+    # استثناء فوري وتلقائي لأي User Profile يبدأ بـ _
+    :if ([:pick $upName 0 1] = "_" || $upName ~ "^_") do={
+        :set isEx 1
+    } else={
+        :foreach ex in=$excludedProfiles do={
+            :if ($ex != "" && $ex = $upName) do={ :set isEx 1 }
+        }
     }
+
     :if ($isEx = 0) do={
         :do {
             set $up insert-queue-before="Speed"
@@ -193,8 +238,32 @@
             :if ([:tostr $enableUserManager] = "true") do={
                 set $up shared-users=5
             }
-            set $up on-login=$onLoginCmd
-            set $up on-logout=$onLogoutCmd
+            :local finalLogin $onLoginCmd
+            :local finalLogout $onLogoutCmd
+
+            :if ([:tostr $preserveExistingScripts] = "true") do={
+                :local curLogin [get $up on-login]
+                :local curLogout [get $up on-logout]
+
+                :if ($curLogin != "" && $curLogin != nil) do={
+                    :if (!($curLogin ~ "Updateoff")) do={
+                        :set finalLogin ($onLoginCmd . "\r\n" . $curLogin)
+                    } else={
+                        :set finalLogin $curLogin
+                    }
+                }
+
+                :if ($curLogout != "" && $curLogout != nil) do={
+                    :if (!($curLogout ~ "queue simple remove")) do={
+                        :set finalLogout ($onLogoutCmd . "\r\n" . $curLogout)
+                    } else={
+                        :set finalLogout $curLogout
+                    }
+                }
+            }
+
+            set $up on-login=$finalLogin
+            set $up on-logout=$finalLogout
             :log info ("[SEC 3 - OK] User Profile configured: " . $upName)
         } on-error={
             :set sec3Err ($sec3Err + 1)
@@ -202,7 +271,7 @@
             :log error ("[SEC 3 - ERROR] Failed on User Profile '" . $upName . "' (check if queue 'Speed' exists or profile is locked).")
         }
     } else={
-        :log info ("[SEC 3 - SKIPPED] User Profile excluded: " . $upName)
+        :log info ("[SEC 3 - SKIPPED] User Profile untouched (starts with _): " . $upName)
     }
 }
 
@@ -211,16 +280,20 @@
 }
 
 # ج) توحيد كلمات مرور مستخدمي الهوتسبوت لتطابق اسم المستخدم (عدا default-trial)
-:log info "[SEC 3] Synchronizing Hotspot user passwords with usernames..."
-:do {
-    :local uCount 0
-    :foreach u in=[/ip hotspot user find where name!="default-trial"] do={
-        /ip hotspot user set $u password=[/ip hotspot user get $u name]
-        :set uCount ($uCount + 1)
+:if ([:tostr $syncUserPasswords] = "true") do={
+    :log info "[SEC 3] Synchronizing Hotspot user passwords with usernames..."
+    :do {
+        :local uCount 0
+        :foreach u in=[/ip hotspot user find where name!="default-trial"] do={
+            /ip hotspot user set $u password=[/ip hotspot user get $u name]
+            :set uCount ($uCount + 1)
+        }
+        :log info ("[SEC 3 - OK] Hotspot user passwords synchronized (" . [:tostr $uCount] . " users updated).")
+    } on-error={
+        :log warning "[SEC 3 - SKIPPED] Failed or no users found to synchronize passwords."
     }
-    :log info ("[SEC 3 - OK] Hotspot user passwords synchronized (" . [:tostr $uCount] . " users updated).")
-} on-error={
-    :log warning "[SEC 3 - SKIPPED] Failed or no users found to synchronize passwords."
+} else={
+    :log info "[SEC 3 - SKIPPED] Hotspot user passwords kept untouched (syncUserPasswords is false)."
 }
 
 # د) مسح الكوكيز المخزنة في الهوتسبوت
